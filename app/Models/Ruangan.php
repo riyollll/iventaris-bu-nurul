@@ -1,0 +1,20 @@
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Attributes\Fillable;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+
+#[Fillable([
+    'kode_ruangan',
+    'nama_ruangan',
+    'penanggung_jawab',
+])]
+class Ruangan extends Model
+{
+    public function barangs(): HasMany
+    {
+        return $this->hasMany(Barang::class);
+    }
+}
