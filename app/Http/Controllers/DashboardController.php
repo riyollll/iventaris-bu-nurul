@@ -4,8 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\Barang;
 use App\Models\LaporanKerusakan;
-use Illuminate\Contracts\View\View;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\View\View;
 
 class DashboardController extends Controller
 {

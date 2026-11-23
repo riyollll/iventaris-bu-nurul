@@ -4,12 +4,12 @@ namespace App\Http\Controllers;
 
 use App\Models\Barang;
 use App\Models\LaporanKerusakan;
-use Illuminate\Contracts\View\View;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Validation\Rule;
+use Illuminate\View\View;
 
 class LaporanKerusakanController extends Controller
 {
@@ -74,15 +74,7 @@ class LaporanKerusakanController extends Controller
                 ->withErrors(['setup' => 'Tabel barang dan laporan kerusakan harus tersedia sebelum laporan dapat disimpan.']);
         }
 
-        $data = $request->validate([
-            'barang_id' => ['required', 'integer', Rule::exists('barangs', 'id')],
-            'pelapor' => ['required', 'string', 'max:255'],
-            'tanggal_lapor' => ['required', 'date'],
-            'deskripsi' => ['required', 'string', 'max:10000'],
-            'status' => ['required', Rule::in(self::STATUS)],
-        ]);
-
-        $laporanKerusakan = LaporanKerusakan::create($data);
+        $laporanKerusakan = LaporanKerusakan::create($request->validate($this->rules()));
 
         return redirect()
             ->route('laporan-kerusakan.show', $laporanKerusakan)
@@ -116,15 +108,7 @@ class LaporanKerusakanController extends Controller
                 ->withErrors(['setup' => 'Tabel barang dan laporan kerusakan harus tersedia sebelum laporan dapat disimpan.']);
         }
 
-        $data = $request->validate([
-            'barang_id' => ['required', 'integer', Rule::exists('barangs', 'id')],
-            'pelapor' => ['required', 'string', 'max:255'],
-            'tanggal_lapor' => ['required', 'date'],
-            'deskripsi' => ['required', 'string', 'max:10000'],
-            'status' => ['required', Rule::in(self::STATUS)],
-        ]);
-
-        $laporanKerusakan->update($data);
+        $laporanKerusakan->update($request->validate($this->rules()));
 
         return redirect()
             ->route('laporan-kerusakan.show', $laporanKerusakan)
@@ -140,9 +124,6 @@ class LaporanKerusakanController extends Controller
             ->with('success', 'Laporan kerusakan berhasil dihapus.');
     }
 
-    /**
-     * @return array<int, object>
-     */
     private function barangOptions(): array
     {
         if (! Schema::hasTable('barangs')) {
@@ -159,6 +140,17 @@ class LaporanKerusakanController extends Controller
     {
         return Schema::hasTable('barangs')
             && Schema::hasTable('laporan_kerusakans');
+    }
+
+    private function rules(): array
+    {
+        return [
+            'barang_id' => ['required', 'integer', Rule::exists('barangs', 'id')],
+            'pelapor' => ['required', 'string', 'max:255'],
+            'tanggal_lapor' => ['required', 'date'],
+            'deskripsi' => ['required', 'string', 'max:10000'],
+            'status' => ['required', Rule::in(self::STATUS)],
+        ];
     }
 
     /**

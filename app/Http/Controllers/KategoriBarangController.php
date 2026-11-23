@@ -3,9 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Models\KategoriBarang;
-use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\View\View;
 
 class KategoriBarangController extends Controller
 {
@@ -31,11 +31,7 @@ class KategoriBarangController extends Controller
 
     public function store(Request $request): RedirectResponse
     {
-        $data = $request->validate([
-            'nama_kategori' => ['required', 'string', 'max:255'],
-        ]);
-
-        $kategoriBarang = KategoriBarang::create($data);
+        $kategoriBarang = KategoriBarang::create($request->validate($this->rules()));
 
         return redirect()
             ->route('kategori-barangs.show', $kategoriBarang)
@@ -56,11 +52,7 @@ class KategoriBarangController extends Controller
 
     public function update(Request $request, KategoriBarang $kategoriBarang): RedirectResponse
     {
-        $data = $request->validate([
-            'nama_kategori' => ['required', 'string', 'max:255'],
-        ]);
-
-        $kategoriBarang->update($data);
+        $kategoriBarang->update($request->validate($this->rules()));
 
         return redirect()
             ->route('kategori-barangs.show', $kategoriBarang)
@@ -78,5 +70,12 @@ class KategoriBarangController extends Controller
         return redirect()
             ->route('kategori-barangs.index')
             ->with('success', 'Kategori barang berhasil dihapus.');
+    }
+
+    private function rules(): array
+    {
+        return [
+            'nama_kategori' => ['required', 'string', 'max:255'],
+        ];
     }
 }

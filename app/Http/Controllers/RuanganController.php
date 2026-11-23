@@ -3,11 +3,11 @@
 namespace App\Http\Controllers;
 
 use App\Models\Ruangan;
-use Illuminate\Contracts\View\View;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
+use Illuminate\View\View;
 
 class RuanganController extends Controller
 {
@@ -37,13 +37,7 @@ class RuanganController extends Controller
 
     public function store(Request $request): RedirectResponse
     {
-        $data = $request->validate([
-            'kode_ruangan' => ['required', 'string', 'max:255', Rule::unique('ruangans', 'kode_ruangan')],
-            'nama_ruangan' => ['required', 'string', 'max:255'],
-            'penanggung_jawab' => ['required', 'string', 'max:255'],
-        ]);
-
-        $ruangan = Ruangan::create($data);
+        $ruangan = Ruangan::create($request->validate($this->rules()));
 
         return redirect()
             ->route('ruangans.show', $ruangan)
@@ -64,13 +58,7 @@ class RuanganController extends Controller
 
     public function update(Request $request, Ruangan $ruangan): RedirectResponse
     {
-        $data = $request->validate([
-            'kode_ruangan' => ['required', 'string', 'max:255', Rule::unique('ruangans', 'kode_ruangan')->ignore($ruangan)],
-            'nama_ruangan' => ['required', 'string', 'max:255'],
-            'penanggung_jawab' => ['required', 'string', 'max:255'],
-        ]);
-
-        $ruangan->update($data);
+        $ruangan->update($request->validate($this->rules($ruangan)));
 
         return redirect()
             ->route('ruangans.show', $ruangan)
@@ -88,5 +76,19 @@ class RuanganController extends Controller
         return redirect()
             ->route('ruangans.index')
             ->with('success', 'Ruangan berhasil dihapus.');
+    }
+
+    private function rules(?Ruangan $ruangan = null): array
+    {
+        return [
+            'kode_ruangan' => [
+                'required',
+                'string',
+                'max:255',
+                Rule::unique('ruangans', 'kode_ruangan')->ignore($ruangan),
+            ],
+            'nama_ruangan' => ['required', 'string', 'max:255'],
+            'penanggung_jawab' => ['required', 'string', 'max:255'],
+        ];
     }
 }
